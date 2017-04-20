@@ -12,6 +12,7 @@ import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,6 +30,9 @@ public class ThriftConfig {
 
     ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    @Autowired
+    private HelloWorldService.Iface helloWorldService;
+
     @Bean
     public TServerTransport tServerTransport() {
         try {
@@ -42,10 +46,8 @@ public class ThriftConfig {
     @Bean
     public TServer tServer() {
         //发布服务
-        HelloWorldService.Processor processor = new HelloWorldService.Processor(
-                new HelloWorldServiceImpl());
-        TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(
-                tServerTransport()).processor(processor));
+        HelloWorldService.Processor processor = new HelloWorldService.Processor(helloWorldService);
+        TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(tServerTransport()).processor(processor));
         return server;
     }
 
